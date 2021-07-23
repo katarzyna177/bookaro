@@ -1,25 +1,20 @@
 package pl.kate.bookaro.order.domain;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.Value;
+import lombok.*;
+import pl.kate.bookaro.catalog.domain.Book;
+import pl.kate.bookaro.jpa.BaseEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-public class OrderItem {
-    @Id
-    @GeneratedValue
-    private Long id;
-    private Long bookId;
+public class OrderItem extends BaseEntity {
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private Book book;
     private int quantity;
 
-    public OrderItem(Long bookId, int quantity) {
-        this.bookId = bookId;
-        this.quantity = quantity;
-    }
 }

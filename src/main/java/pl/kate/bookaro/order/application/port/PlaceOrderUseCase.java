@@ -26,8 +26,14 @@ public interface PlaceOrderUseCase {
     @AllArgsConstructor
     class PlaceOrderCommand{
         @Singular
-        List<OrderItem> items;
+        List<OrderItemCommand> items;
         Recipient recipient;
+    }
+
+    @Value
+    class OrderItemCommand {
+        Long bookId;
+        int quantity;
     }
 
     @Value

@@ -9,6 +9,7 @@ import pl.kate.bookaro.order.db.OrderJpaRepository;
 import pl.kate.bookaro.order.domain.Order;
 import pl.kate.bookaro.order.domain.OrderItem;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ public class QueryOrderService implements QueryOrderUseCase {
     private final BookJpaRepository catalogRepository;
 
     @Override
+    @Transactional
     public List<RichOrder> findAll() {
         return repository
                 .findAll()
@@ -36,17 +38,17 @@ public class QueryOrderService implements QueryOrderUseCase {
 
 
     private RichOrder toRichOrder(Order order){
-        List<RichOrderItem> richItems = toRichItems(order.getItems());
+        //List<RichOrderItem> richItems = toRichItems(order.getItems());
         return new RichOrder(
                 order.getId(),
                 order.getStatus(),
-                richItems,
+                order.getItems(),
                 order.getRecipient(),
                 order.getCreatedAt()
         );
     }
 
-    private List<RichOrderItem> toRichItems(List<OrderItem> items) {
+    /*private List<RichOrderItem> toRichItems(List<OrderItem> items) {
         return items.stream()
                 .map(item -> {
                     Book book = catalogRepository
@@ -54,6 +56,6 @@ public class QueryOrderService implements QueryOrderUseCase {
                             .orElseThrow(() -> new IllegalStateException("Unable to find book with ID: " + item.getBookId()));
                             return new RichOrderItem(book, item.getQuantity());
                         }).collect(Collectors.toList());
-    }
+    }*/
 
 }

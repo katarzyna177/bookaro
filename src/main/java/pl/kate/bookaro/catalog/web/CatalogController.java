@@ -17,10 +17,7 @@ import pl.kate.bookaro.catalog.domain.Book;
 import pl.kate.bookaro.order.web.CreatedURI;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMin;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -80,7 +77,7 @@ public class CatalogController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void addBookCover(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
         System.out.println("Got file: "  + file.getOriginalFilename());
-        catalog.UpdateBookCover(new UpdateBookCoverCommand(
+        catalog.updateBookCover(new UpdateBookCoverCommand(
                 id,
                 file.getBytes(),
                 file.getContentType(),
@@ -128,9 +125,12 @@ public class CatalogController {
         @NotNull
         @DecimalMin("0.00")
         private BigDecimal price;
+        @NotNull
+        @PositiveOrZero
+        private Long available;
 
         CreateBookCommand toCreateCommand(){
-            return new CreateBookCommand(title, authors, year, price);
+            return new CreateBookCommand(title, authors, year, price, available);
         }
 
         UpdateBookCommand toUpdateCommand(Long id){

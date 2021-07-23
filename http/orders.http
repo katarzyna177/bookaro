@@ -1,1 +1,38 @@
-GET http://localhost:8080/orders
+###
+POST http://localhost:8080/admin/data
+###
+GET http://localhost:8080/orders/17
+###
+GET http://localhost:8080/catalog
+###
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+   "items" : [
+     {
+       "bookId" : 3,
+       "quantity" : 13
+     },
+     {
+       "bookId" : 4,
+       "quantity" : 7
+     }
+   ],
+  "recipient" : {
+    "name" : "John Doe",
+    "phone" : "123-435-665",
+    "street" : "Cwiartki 3/4",
+    "city" : "Kraków",
+    "zipCode" : "30-150",
+    "email" : "johndoe@example.org"
+  }
+}
+###
+PUT http://localhost:8080/orders/17/status
+Content-Type: application/json
+
+{
+  "status": "SHIPPED"
+}
+

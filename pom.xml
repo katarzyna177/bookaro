@@ -20,10 +20,15 @@
 		<spring.web.version>5.3.6</spring.web.version>
 		<!--<commons.lang.version>3.12.0</commons.lang.version>-->
 		<postgres.version>42.2.22.jre7</postgres.version>
+		<opencsv.version>5.5</opencsv.version>
 	</properties>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>${opencsv.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-maven-plugin</artifactId>

@@ -2,6 +2,7 @@ package pl.kate.bookaro.order.application.port;
 
 import lombok.Value;
 import pl.kate.bookaro.catalog.domain.Book;
+import pl.kate.bookaro.order.domain.OrderItem;
 import pl.kate.bookaro.order.domain.OrderStatus;
 import pl.kate.bookaro.order.domain.Recipient;
 
@@ -9,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static pl.kate.bookaro.order.application.port.PlaceOrderUseCase.*;
 
@@ -21,7 +23,7 @@ public interface QueryOrderUseCase {
     class RichOrder {
         Long id;
         OrderStatus status;
-        List<RichOrderItem> items;
+        Set<OrderItem> items;
         Recipient recipient;
         LocalDateTime createdAt;
 
@@ -32,9 +34,9 @@ public interface QueryOrderUseCase {
         }
     }
 
-    @Value
+    /*@Value
     class RichOrderItem {
         Book book;
         int quantity;
-    }
+    }*/
 }

@@ -31,7 +31,7 @@ public interface CatalogUseCase {
 
     UpdateBookResponse updateBook(UpdateBookCommand command);
 
-    void UpdateBookCover(UpdateBookCoverCommand command);
+    void updateBookCover(UpdateBookCoverCommand command);
 
     void removeBookCover(Long id);
 
@@ -51,6 +51,7 @@ public interface CatalogUseCase {
         Set<Long> authors;
         Integer year;
         BigDecimal price;
+        Long available;
 
     }
 

@@ -42,8 +42,8 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Object> createOrder(@RequestBody CreateOrderCommand command) {
-        PlaceOrderResponse response = placeOrder.placeOrder(command.toPlaceOrderCommand());
+    public ResponseEntity<Object> createOrder(@RequestBody PlaceOrderCommand command) {
+        PlaceOrderResponse response = placeOrder.placeOrder(command);
         if(response.isSuccess()){
             return ResponseEntity.created(orderUri(response.getOrderId())).build();
         }
@@ -71,7 +71,7 @@ public class OrderController {
     }
 
 
-    @Data
+    /*@Data
     private static class CreateOrderCommand {
         List<OrderItemCommand> items;
         RecipientCommand recipient;
@@ -82,15 +82,15 @@ public class OrderController {
                     .map(item -> new OrderItem(item.bookId, item.quantity))
                     .collect(Collectors.toList());
             return new PlaceOrderCommand(orderItems, recipient.toRecipient());
-        }
+        }*/
 
-        @Data
+        /*@Data
         static class OrderItemCommand {
             Long bookId;
             int quantity;
-        }
+        }*/
 
-        @Data
+       /* @Data
         static class RecipientCommand {
             String name;
             String phone;
@@ -102,7 +102,7 @@ public class OrderController {
             Recipient toRecipient() {
                 return new Recipient(name, phone, street, city, zipCode, email);
             }
-        }
+        }*/
 
-    }
+    /*}*/
 }
