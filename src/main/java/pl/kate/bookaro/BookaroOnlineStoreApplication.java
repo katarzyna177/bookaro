@@ -11,7 +11,6 @@ import org.springframework.web.client.RestTemplate;
 import pl.kate.bookaro.order.application.OrderProperties;
 
 @EnableScheduling
-@EnableJpaAuditing
 @SpringBootApplication
 @EnableConfigurationProperties({OrderProperties.class})
 public class BookaroOnlineStoreApplication {

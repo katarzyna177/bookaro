@@ -2,10 +2,8 @@ package pl.kate.bookaro.order.application.port;
 
 import lombok.*;
 import pl.kate.bookaro.catalog.domain.Book;
-import pl.kate.bookaro.order.domain.Order;
-import pl.kate.bookaro.order.domain.OrderItem;
-import pl.kate.bookaro.order.domain.OrderStatus;
-import pl.kate.bookaro.order.domain.Recipient;
+import pl.kate.bookaro.order.commons.Either;
+import pl.kate.bookaro.order.domain.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,7 +15,7 @@ import java.util.Optional;
 public interface PlaceOrderUseCase {
     PlaceOrderResponse placeOrder(PlaceOrderCommand command);
 
-    void updateOrderStatus(Long id, OrderStatus status);
+    UpdateStatusResponse updateOrderStatus(UpdateStatusCommand command);
 
     void removeById(Long id);
 
@@ -28,6 +26,8 @@ public interface PlaceOrderUseCase {
         @Singular
         List<OrderItemCommand> items;
         Recipient recipient;
+        @Builder.Default
+        Delivery delivery = Delivery.COURIER;
     }
 
     @Value
@@ -37,18 +37,39 @@ public interface PlaceOrderUseCase {
     }
 
     @Value
-    class PlaceOrderResponse{
-        boolean success;
+    class UpdateStatusCommand{
         Long orderId;
-        List<String> errors;
+        OrderStatus status;
+        String email;
+    }
 
 
+    class PlaceOrderResponse extends Either<String, Long> {
+        public PlaceOrderResponse (boolean success, String left, Long right){
+            super (success, left, right);
+        }
         public static PlaceOrderResponse success(Long orderId){
-            return new PlaceOrderResponse(true, orderId, Collections.emptyList());
+            return new PlaceOrderResponse(true, null, orderId);
         }
 
-        public static PlaceOrderResponse failure(String... errors){
-            return new PlaceOrderResponse(false, null, Arrays.asList(errors));
+        public static PlaceOrderResponse failure(String error){
+            return new PlaceOrderResponse(false, error, null);
+        }
+
+    }
+
+
+    class UpdateStatusResponse extends Either<String, OrderStatus>{
+
+        public UpdateStatusResponse (boolean success, String left, OrderStatus right){
+            super (success, left, right);
+        }
+        public static UpdateStatusResponse success(OrderStatus status){
+            return new UpdateStatusResponse(true, null, status);
+        }
+
+        public static UpdateStatusResponse failure(String error){
+            return new UpdateStatusResponse(false, error, null);
         }
 
     }

@@ -31,6 +31,7 @@ public class PlaceOrderService implements PlaceOrderUseCase {
         Order order = Order
                 .builder()
                 .recipient(getOrCreateRecipient(command.getRecipient()))
+                .delivery(command.getDelivery())
                 .items(items)
                 .build();
         Order save = repository.save(order);
@@ -68,17 +69,25 @@ public class PlaceOrderService implements PlaceOrderUseCase {
     }
 
     @Override
-    public void updateOrderStatus(Long id, OrderStatus status) {
-        repository.findById(id)
-                .ifPresent(order -> {
-                    //order.setStatus(status);
-                    UpdateStatusResult result = order.updateStatus(status);
+    public UpdateStatusResponse updateOrderStatus(UpdateStatusCommand command) {
+        return repository.findById(command.getOrderId())
+                .map(order -> {
+                    if(!hasAccess(command, order)){
+                        return UpdateStatusResponse.failure("Unauthorized");
+                    }
+                    UpdateStatusResult result = order.updateStatus(command.getStatus());
                     if(result.isRevoked()){
                         bookJpaRepository.saveAll(revokeBooks(order.getItems()));
                     }
-
                     repository.save(order);
-        });
+                    return UpdateStatusResponse.success(order.getStatus());
+        })
+                .orElse(UpdateStatusResponse.failure("Order not found"));
+    }
+
+    private boolean hasAccess(UpdateStatusCommand command, Order order) {
+        String email = command.getEmail();
+        return command.getEmail().equalsIgnoreCase(order.getRecipient().getEmail()) || email.equalsIgnoreCase("admin@example.org");
     }
 
     private Set<Book> revokeBooks(Set<OrderItem> items) {

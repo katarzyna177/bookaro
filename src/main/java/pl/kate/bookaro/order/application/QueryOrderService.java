@@ -3,11 +3,11 @@ package pl.kate.bookaro.order.application;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.kate.bookaro.catalog.db.BookJpaRepository;
-import pl.kate.bookaro.catalog.domain.Book;
 import pl.kate.bookaro.order.application.port.QueryOrderUseCase;
+import pl.kate.bookaro.order.application.price.OrderPrice;
+import pl.kate.bookaro.order.application.price.PriceService;
 import pl.kate.bookaro.order.db.OrderJpaRepository;
 import pl.kate.bookaro.order.domain.Order;
-import pl.kate.bookaro.order.domain.OrderItem;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class QueryOrderService implements QueryOrderUseCase {
     private final OrderJpaRepository repository;
-    private final BookJpaRepository catalogRepository;
+    private final PriceService priceService;
 
     @Override
     @Transactional
@@ -31,6 +31,7 @@ public class QueryOrderService implements QueryOrderUseCase {
     }
 
     @Override
+    @Transactional
     public Optional<RichOrder> findById(Long id) {
         return repository.findById(id)
                 .map(this::toRichOrder);
@@ -39,12 +40,15 @@ public class QueryOrderService implements QueryOrderUseCase {
 
     private RichOrder toRichOrder(Order order){
         //List<RichOrderItem> richItems = toRichItems(order.getItems());
+        OrderPrice orderPrice = priceService.calculatePrice(order);
         return new RichOrder(
                 order.getId(),
                 order.getStatus(),
                 order.getItems(),
                 order.getRecipient(),
-                order.getCreatedAt()
+                order.getCreatedAt(),
+                orderPrice,
+                orderPrice.finalPrice()
         );
     }
 

@@ -137,16 +137,16 @@ public class CatalogInitializerService implements CatalogInitializerUseCase {
                 .item(new PlaceOrderUseCase.OrderItemCommand(javaPuzzlers.getId(), 7))
                 .build();
         PlaceOrderUseCase.PlaceOrderResponse response = placeOrder.placeOrder(command);
-        /*String result = response.handle(
+        String result = response.handle(
                 orderId -> "Created ORDER with id: " + orderId,
                 error -> "Failed to created order: " + error
         );
-        System.out.println(result);*/
-        log.info("Created ORDER with id: " + response.getOrderId());
+        log.info(result);
+        //log.info("Created ORDER with id: " + response.getOrderId());
 
         //list all orders
         queryOrder.findAll().forEach(order -> {
-            log.info("GOT ORDER WITH TOTAL PRICE: " + order.totalPrice() + "DETAILS: " + order);
+            log.info("GOT ORDER WITH TOTAL PRICE: " + order.getFinalPrice() + "DETAILS: " + order);
         });
     }
 

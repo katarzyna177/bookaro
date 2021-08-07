@@ -1,23 +1,23 @@
 package pl.kate.bookaro.order.web;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import pl.kate.bookaro.order.application.RichOrder;
 import pl.kate.bookaro.order.application.port.PlaceOrderUseCase;
 import pl.kate.bookaro.order.application.port.PlaceOrderUseCase.PlaceOrderCommand;
 import pl.kate.bookaro.order.application.port.PlaceOrderUseCase.PlaceOrderResponse;
 import pl.kate.bookaro.order.application.port.QueryOrderUseCase;
-import pl.kate.bookaro.order.domain.OrderItem;
 import pl.kate.bookaro.order.domain.OrderStatus;
-import pl.kate.bookaro.order.domain.Recipient;
 
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
+
+import static pl.kate.bookaro.order.application.port.PlaceOrderUseCase.*;
 
 @RequestMapping("/orders")
 @RestController
@@ -28,12 +28,12 @@ public class OrderController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    List<QueryOrderUseCase.RichOrder> getAll(){
+    List<RichOrder> getAll(){
         return queryOrder.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<QueryOrderUseCase.RichOrder> getById(@PathVariable Long id){
+    public ResponseEntity<RichOrder> getById(@PathVariable Long id){
         return queryOrder
                 .findById(id)
                 .map(ResponseEntity::ok)
@@ -43,11 +43,17 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<Object> createOrder(@RequestBody PlaceOrderCommand command) {
-        PlaceOrderResponse response = placeOrder.placeOrder(command);
+        return placeOrder
+                .placeOrder(command)
+                .handle(
+                        orderId -> ResponseEntity.created(orderUri(orderId)).build(),
+                        error -> ResponseEntity.badRequest().body(error)
+                );
+        /*PlaceOrderResponse response = placeOrder.placeOrder(command);
         if(response.isSuccess()){
             return ResponseEntity.created(orderUri(response.getOrderId())).build();
         }
-        return ResponseEntity.badRequest().body(response.getErrors());
+        return ResponseEntity.badRequest().body(response.getErrors());*/
 
     }
 
@@ -57,11 +63,13 @@ public class OrderController {
 
     @PutMapping("/{id}/status")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void updateOrderStatus(@PathVariable Long id, @RequestBody String status){
+    public void updateOrderStatus(@PathVariable Long id, @RequestBody Map<String, String> body){
+        String status = body.get("status");
         OrderStatus orderStatus = OrderStatus
                 .parseString(status)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown status: " + status));
-        placeOrder.updateOrderStatus(id, orderStatus);
+        UpdateStatusCommand command = new UpdateStatusCommand(id, orderStatus, null);
+        placeOrder.updateOrderStatus(command);
     }
 
     @DeleteMapping("/{id}")
